@@ -72,7 +72,7 @@ make -C "$SRC" O="$OUT" olddefconfig 2>&1 | tail -5
 NPROC=$(nproc)
 echo ">>> make -j$NPROC Image dtbs modules"
 LOG="$OUT/build.log"
-make -C "$SRC" O="$OUT" -j"$NPROC" Image dtbs modules >"$LOG" 2>&1; RC=$?
+make -C "$SRC" O="$OUT" -j"$NPROC" LOCALVERSION="" Image dtbs modules >"$LOG" 2>&1; RC=$?
 grep -E "warning:|error:|Error " "$LOG" | tail -40 || true
 [ "$RC" -eq 0 ] || { echo "FATAL: make failed (rc=$RC), see $LOG"; exit "$RC"; }
 

@@ -1,0 +1,35 @@
+From: Nyx <mail.me.nyx@gmail.com>
+Date: Sun, 6 Sep 2026 22:40:00 +0530
+Subject: [PATCH 4/4] ASoC: es8328: program the MCLK/LRCK ratio in consumer mode too
+
+When the ES8388 is the clock consumer (SoC I2S is master) the driver left
+DACCONTROL2/ADCCONTROL5 at 0. On the AMedia RK3588 board (ES8388 on I2S0,
+MCLK 12.288 MHz, 48 kHz) that produced garbled output; the vendor driver
+always programs the ratio. Use the same lookup as provider mode whenever
+the MCLK is known via set_sysclk().
+---
+diff --git a/sound/soc/codecs/es8328.c b/sound/soc/codecs/es8328.c
+index c0d7ce64b2d..49cb7e0cf95 100644
+--- a/sound/soc/codecs/es8328.c
++++ b/sound/soc/codecs/es8328.c
+@@ -499,6 +499,20 @@ static int es8328_hw_params(struct snd_pcm_substream *substream,
+ 			return -EINVAL;
+ 		}
+ 		ratio = es8328->mclk_ratios[i];
++	} else if (es8328->sysclk_constraints) {
++		/*
++		 * Consumer (slave) mode with a known MCLK: the ES8388 still
++		 * needs the MCLK/LRCK ratio programmed for its internal
++		 * DAC/ADC filters, otherwise playback is garbled. Look the
++		 * ratio up exactly as in provider mode; fall back to 0
++		 * (auto) if the rate is not in the table.
++		 */
++		for (i = 0; i < es8328->sysclk_constraints->count; i++)
++			if (es8328->sysclk_constraints->list[i] ==
++			    params_rate(params))
++				break;
++		ratio = (i < es8328->sysclk_constraints->count) ?
++			es8328->mclk_ratios[i] : 0;
+ 	} else {
+ 		ratio = 0;
+ 		es8328->mclkdiv2 = 0;
