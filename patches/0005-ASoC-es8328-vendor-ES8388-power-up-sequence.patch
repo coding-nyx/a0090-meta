@@ -1,0 +1,10 @@
+From: Nyx <mail.me.nyx@gmail.com>
+Date: Sun, 6 Sep 2026 23:40:00 +0530
+Subject: [PATCH 5/5] ASoC: es8328: apply the Rockchip vendor ES8388 power-up sequence
+
+The ES8388 on the AMedia RK3588 LP4 V10 (hub-11) decodes a valid I2S stream
+into noise with the mainline initialisation. The vendor es8323.c driver
+programs DAC-side MCLK as chip master clock, ADC/DAC same-fs, SLRCK, the
+analog low-power bits and the ADC ratio at probe; replay that sequence via
+regmap at component probe and keep the ADC divider in step with the DAC one.
+---
