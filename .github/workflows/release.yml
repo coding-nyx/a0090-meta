@@ -1,0 +1,48 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-aarch64-linux-gnu \
+            binutils-aarch64-linux-gnu \
+            uboot-tools \
+            device-tree-compiler \
+            libssl-dev \
+            bc bison flex \
+            libelf-dev \
+            dwarves \
+            rsync zstd \
+            python3-yaml
+
+      - name: Cross-build kernel + FIT
+        run: bash scripts/ci-build.sh
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ runner.temp }}/dist/Image
+            ${{ runner.temp }}/dist/vendor.dtb
+            ${{ runner.temp }}/dist/rk3588-hub11.dtb
+            ${{ runner.temp }}/dist/rk3588-hub11-sdhs.dtb
+            ${{ runner.temp }}/dist/KREL
+            ${{ runner.temp }}/dist/resource.img
+            ${{ runner.temp }}/dist/hub11-boot-*.itb
+            ${{ runner.temp }}/dist/modules.tar.zst
+            ${{ runner.temp }}/dist/SHA256SUMS
+          generate_release_notes: true

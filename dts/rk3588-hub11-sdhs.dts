@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * AMedia RK3588 LP4 V10 (hub-11) — SD high-speed-only fallback variant.
+ * Identical to rk3588-hub11.dts except the microSD slot stays at 3.3 V
+ * high-speed (no UHS/SDR104), matching what the vendor DTB did. Use when
+ * dmesg shows SDR104 tuning failures or vqmmc errors on mmc1.
+ */
+#include "rk3588-hub11.dts"
+
+/ {
+	model = "AMedia RK3588 LP4 V10 Board (SD high-speed only)";
+};
+
+&sdmmc {
+	/delete-property/ sd-uhs-sdr104;
+	/delete-property/ vqmmc-supply;
+};

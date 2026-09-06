@@ -1,0 +1,15 @@
+#!/bin/sh
+# Create wlan1 (type AP) on the same phy as wlan0. brcmfmac's firmware
+# interface-create calls fail on the AP6275P (err=-52) but the driver's
+# legacy fallback succeeds, so ignore the dmesg noise and check the result.
+set -eu
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+[ -d /sys/class/net/wlan1 ] && exit 0
+[ -d /sys/class/net/wlan0 ] || { echo "wlan0 absent" >&2; exit 1; }
+PHY=$(cat /sys/class/net/wlan0/phy80211/name)
+iw phy "$PHY" interface add wlan1 type __ap
+M0=$(cat /sys/class/net/wlan0/address); M1=$(cat /sys/class/net/wlan1/address)
+if [ "$M0" = "$M1" ]; then
+  # Firmware gave no distinct MAC: derive one with the locally-administered bit.
+  ip link set dev wlan1 address "$(printf '%02x%s' $(( 0x${M0%%:*} | 0x02 )) "${M0#??}")"
+fi

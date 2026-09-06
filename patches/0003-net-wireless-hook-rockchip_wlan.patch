@@ -1,0 +1,23 @@
+From: Nyx <mail.me.nyx@gmail.com>
+Date: Sun, 6 Sep 2026 20:30:00 +0530
+Subject: [PATCH 3/3] net: wireless: hook the Rockchip bcmdhd tree into Kconfig/Makefile
+
+The driver sources live in the hub-11 meta repo (kernel-extra/) and are
+copied into drivers/net/wireless/rockchip_wlan before the build.
+---
+--- a/drivers/net/wireless/Kconfig
++++ b/drivers/net/wireless/Kconfig
+@@ -39,4 +39,6 @@
+ 
+ source "drivers/net/wireless/virtual/Kconfig"
+ 
++source "drivers/net/wireless/rockchip_wlan/Kconfig"
++
+ endif # WLAN
+--- a/drivers/net/wireless/Makefile
++++ b/drivers/net/wireless/Makefile
+@@ -23,3 +23,4 @@
+ obj-$(CONFIG_WLAN_VENDOR_ZYDAS) += zydas/
+ 
+ obj-$(CONFIG_WLAN) += virtual/
++obj-$(CONFIG_WL_ROCKCHIP) += rockchip_wlan/

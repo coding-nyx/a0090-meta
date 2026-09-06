@@ -1,0 +1,3 @@
+# Pinned kernel version. Bump monthly via Dependabot or manually.
+# Use linux-6.18.y LTS (2025 LTS, supported until Dec 2028 per kernel.org).
+v6.18.49

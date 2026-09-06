@@ -1,0 +1,81 @@
+name: lint
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Kconfig fragments parse cleanly
+        shell: bash
+        run: |
+          set -euo pipefail
+          rc=0
+          for f in configs/*.config; do
+            bad=$(grep -vE '^\s*(#|$)' "$f" | grep -vE '^CONFIG_[A-Z0-9_]+=(y|m|n|[0-9]+|"[^"]*")$' || true)
+            if [ -n "$bad" ]; then echo "FAIL: $f"; echo "$bad"; rc=1; else echo "OK: $f"; fi
+          done
+          exit $rc
+
+      - name: Shell scripts pass bash -n and shellcheck
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -q shellcheck >/dev/null
+          for s in scripts/*.sh rootfs/hooks/*.sh; do bash -n "$s"; done
+          shellcheck -S warning scripts/*.sh rootfs/hooks/*.sh
+
+      - name: Device tree sources compile
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -q device-tree-compiler >/dev/null
+          # Syntax only (includes need the kernel tree; that is exercised by release.yml).
+          for d in dts/rk3588-hub11*.dts; do
+            cpp -nostdinc -undef -x assembler-with-cpp -I dts -E "$d" >/dev/null && echo "OK: $d preprocesses"
+          done
+
+      - name: FIT source is well-formed
+        run: |
+          python3 - <<'PY'
+          import sys
+          text = open('fit/hub11-boot.its').read()
+          if text.count('{') != text.count('}'):
+            sys.exit('FAIL: mismatched braces in fit/hub11-boot.its')
+          for token in ['kernel', 'fdt', 'resource', 'configurations']:
+            if token not in text:
+              sys.exit(f'FAIL: missing {token} section')
+          print('OK: FIT source structure is valid')
+          PY
+
+      - name: Firmware MANIFEST sha256s match
+        run: |
+          pip install -q pyyaml
+          python3 - <<'PY'
+          import hashlib, os, yaml, sys
+          data = yaml.safe_load(open('firmware-blobs/MANIFEST.yaml'))
+          for blob in data['blobs']:
+            p = blob['path']
+            if not os.path.exists(p):
+              print(f'  WARN: {p} not present'); continue
+            actual = hashlib.sha256(open(p, 'rb').read()).hexdigest()
+            if actual != blob['sha256']:
+              sys.exit(f'FAIL: sha256 mismatch for {p}')
+            print(f'  OK: {p}')
+          PY
+
+      - name: No secrets in tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! git grep -n -I -E 'psk=|PRIVATE KEY|tskey-' -- . ':!docs/' ':!.github/' ':!rootfs/secrets.example/' ':!rootfs/overlay-optional/wlan1-ap/hub11-ap.nmconnection.in'
+          test ! -d rootfs/secrets || { echo "FAIL: rootfs/secrets is tracked"; exit 1; }

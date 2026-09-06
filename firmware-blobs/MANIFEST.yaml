@@ -1,0 +1,83 @@
+# Vendor firmware blob manifest
+#
+# These are proprietary blobs extracted from a Rockchip vendor Debian 11
+# rootfs (`/vendor/etc/firmware`) and from the rkbin project
+# (`/DATA/src/rkbin/bin/rk35/`). They are reproduced here so the upstream
+# mainline Linux 6.18 build is reproducible without needing the vendor image.
+#
+# Source paths refer to a flash of vendor image
+# `XML-RK3588-Debian11-20250407_1436.img` from Rockchip.
+
+blobs:
+
+  # ===== Broadcom Wi-Fi (BCM43752 / AP6275P module on PCIe x1) =====
+  - path: firmware-blobs/brcm/brcmfmac43752-pcie.bin
+    sha256: 6a2dbe01e72221defba91a52e158768d973a3c85ca2d881c924379e35ad36b23
+    source: hub-11:/vendor/etc/firmware/fw_bcm43752a2_pcie_ag.bin
+    license: Proprietary Broadcom (no public redistribution without agreement)
+    install: /lib/firmware/brcm/brcmfmac43752-pcie.bin
+    notes: |
+      936074 bytes. Renamed from vendor `fw_bcm43752a2_pcie_ag.bin`. Loaded by
+      `brcmfmac` (CONFIG_BRCMFMAC=m + CONFIG_BRCMFMAC_PCIE=y). Vendor DTB
+      annotates this chip as `wifi_chip_type = "ap6255"` (stale label); real
+      module per PCI ID 14e4:449d is BCM43752 (Ampak AP6275P).
+
+  - path: firmware-blobs/brcm/brcmfmac43752-pcie.clm_blob
+    sha256: d81ba8adc8b3bc0a5589146b31bc318122693d8a116a5028d3fe826556c5a92a
+    source: hub-11:/vendor/etc/firmware/clm_bcm43752a2_pcie_ag.blob
+    license: Proprietary Broadcom
+    install: /lib/firmware/brcm/brcmfmac43752-pcie.clm_blob
+    notes: |
+      Country Locale Matrix blob. 30993 bytes. Loaded automatically by brcmfmac
+      once the .bin firmware is in place.
+
+  - path: firmware-blobs/brcm/brcmfmac43752-pcie.txt
+    sha256: b4780f7b86a5680dbe496815dbe07aa22010701de2d8c60570b8274a42db215b
+    source: hub-11:/vendor/etc/firmware/nvram_ap6275p.txt
+    license: Proprietary Broadcom
+    install: /lib/firmware/brcm/brcmfmac43752-pcie.txt
+    notes: |
+      NVRAM configuration text. 7458 bytes. Renamed from
+      `nvram_ap6275p.txt`. brcmfmac looks for `-pcie.txt` matching the firmware
+      name.
+
+  # ===== Broadcom Bluetooth (BCM4362A2 on UART ttyS9) =====
+  - path: firmware-blobs/brcm/BCM4362A2.hcd
+    sha256: 3a0a926fa800c121f850ed4f961a1e058a993666d9ee565c1e46dfd596e25567
+    source: hub-11:/lib/firmware/BCM4362A2.hcd
+    license: Proprietary Broadcom
+    install: /lib/firmware/brcm/BCM4362A2.hcd
+    notes: |
+      91692 bytes. Loaded by `btbcm` serdev driver (CONFIG_BT_HCIUART_BCM=y +
+      CONFIG_BT_HCIUART_SERDEV=y + CONFIG_SERIAL_DEV_BUS=y). Replaces the
+      vendor `brcm_patchram_plus1` userspace helper.
+
+  # ===== Rockchip resource image (bootsplash + DTBO) =====
+  - path: firmware-blobs/resource.img
+    sha256: 4cdeb8acc82f8b9843ee8012bf769b32bffc66a0657ce2730e6fd8cc5d5a2e16
+    source: hub-11:/DATA/build/hub11-6.1-infra/resource.img
+    license: Rockchip proprietary (vendor binary)
+    install: not copied to /lib; embedded inside the FIT as a `resource` node
+    notes: |
+      12617216 bytes (12 MiB). Carries vendor bootsplash + DTBO. Embedded in
+      the FIT image via `mkimage -f fit/hub11-boot.its`. Boot time: p3 has
+      only 64 MiB so the FIT budget is tight — see scripts/build-fit.sh.
+
+  # ===== ARM Mali-G610 Panthor CSF GPU Firmware =====
+  - path: firmware-blobs/mali/mali_csffw.bin
+    sha256: a27847ea11f8efb3136340c3ba8aab413ae25145eeb4a7f64ff5edd829a2405b
+    source: Debian / linux-firmware (mali_csffw.bin for CSF arch 10.8)
+    license: ARM proprietary binary firmware
+    install: /lib/firmware/arm/mali/arch10.8/mali_csffw.bin
+    notes: |
+      282536 bytes. Required by the Panthor DRM GPU driver (Mali-G610 MP4).
+
+  # ===== Original Vendor Device Tree Blob (extracted from partition p3) =====
+  - path: firmware-blobs/vendor-p3-extracted.dtb
+    sha256: f566eb22606a46f1895f68c565d5962bececbd0b27975dda2d7a72e37356125c
+    source: hub-11:/dev/mmcblk0p3 (extracted from original vendor FIT image)
+    license: GPL-2.0+
+    install: reference only; decompiled DTS at dts/rk3588-vendor-p3-extracted.dts
+    notes: |
+      172424 bytes. The bit-for-bit factory DTB loaded by vendor U-Boot SPL.
+

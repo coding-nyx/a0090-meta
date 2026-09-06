@@ -1,0 +1,2 @@
+# When the brcmfmac client interface appears, create the wlan1 AP interface.
+SUBSYSTEM=="net", ACTION=="add", KERNEL=="wlan0", DRIVERS=="brcmfmac", TAG+="systemd", ENV{SYSTEMD_WANTS}+="wlan1-ap-iface.service"

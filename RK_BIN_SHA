@@ -1,0 +1,15 @@
+# SHA256 pins for vendor rk3588 first-stage binaries (rkbin).
+# These go into the U-Boot FIT on mmcblk0p1 and are untouched by us.
+# Source: hub-11:/DATA/src/rkbin/bin/rk35/  (rkbin repo, vendor-tagged).
+
+# ATF (BL31)
+rk3588_bl31_v1.56.elf  2864c2fc36333e03e7e3fe6459225d320d310850b4ac7620d1f3601efb7d4a9b
+
+# OP-TEE (BL32)
+rk3588_bl32_v1.23.bin  cb4ec2d0d8986b22cc55dbcf57c499f10fcca124bcd1e9a5d62cbf9ce0f40636
+
+# SPL loader
+rk3588_spl_v1.14.bin   b811b90b6847dc251838e82036c328f00eaacefe94659432265a0ccb0fc8f4e5
+
+# DDR training (LPDDR4 @ 1848 MHz / LPDDR5 @ 2112 MHz)
+rk3588_ddr_lp4_1848MHz_lp5_2112MHz_v1.24.bin  7d114862d4958841886afc97cf82affb2bd88bc3b968f636e7e9ed898410c353

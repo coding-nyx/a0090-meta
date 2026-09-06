@@ -1,0 +1,11 @@
+# k3s node / VPN userspace. Profile: infra
+# k3s itself is not in Debian; install with:
+#   curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --node-ip 100.88.4.63" K3S_URL=... K3S_TOKEN=... sh -
+# Tailscale comes from pkgs.tailscale.com (rootfs/hooks/30-tailscale.sh), never with a baked node key.
+iptables
+ipset
+ipvsadm
+conntrack
+nftables
+cri-tools
+wireguard-tools

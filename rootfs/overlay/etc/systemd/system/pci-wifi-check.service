@@ -1,0 +1,11 @@
+[Unit]
+Description=Rescan PCI if the brcmfmac Wi-Fi card did not enumerate
+After=network-pre.target
+Before=NetworkManager.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'if ! ip link show wlan0 >/dev/null 2>&1; then echo 1 > /sys/bus/pci/rescan; fi'
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,61 @@
+# Base package set for the hub-11 Debian 13 (trixie) rootfs.
+# Consumed by scripts/build-rootfs.sh as the debootstrap --include list
+# (variant=minbase, --exclude=ifupdown). One package per line.
+
+# init, devices, time
+systemd
+systemd-sysv
+systemd-timesyncd
+systemd-container
+udev
+dbus
+kmod
+sudo
+locales
+tzdata
+busybox-static
+
+# storage, swap
+e2fsprogs
+dosfstools
+systemd-zram-generator
+zstd
+tar
+rsync
+
+# networking (NetworkManager owns everything; no ifupdown)
+network-manager
+dnsmasq-base
+wpasupplicant
+wireless-regdb
+iw
+iproute2
+iputils-ping
+ethtool
+avahi-daemon
+openssh-server
+curl
+wget
+gnupg
+ca-certificates
+iptables
+nftables
+ipset
+bridge-utils
+
+# hardware tools
+pciutils
+usbutils
+bluez
+fio
+hdparm
+f3
+
+# admin basics
+vim-tiny
+less
+man-db
+git
+htop
+apparmor
+apparmor-utils

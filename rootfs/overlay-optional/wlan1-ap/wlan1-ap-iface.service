@@ -1,0 +1,12 @@
+[Unit]
+Description=Create wlan1 AP virtual interface on the brcmfmac phy
+After=sys-subsystem-net-devices-wlan0.device
+BindsTo=sys-subsystem-net-devices-wlan0.device
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/wlan1-ap-iface
+
+[Install]
+WantedBy=multi-user.target

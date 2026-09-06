@@ -1,0 +1,27 @@
+#!/bin/sh
+# Keep the wlan1 hotspot on wlan0's channel (brcmfmac allows STA+AP only on
+# one channel) and only while wlan0 is associated.
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+AP=hub11-ap
+[ "$1" = wlan0 ] || exit 0
+case "$2" in
+  up)
+    INFO=$(iw dev wlan0 info)
+    CH=$(echo "$INFO" | awk '/channel/{print $2}')
+    FREQ=$(echo "$INFO" | awk '/channel/{gsub(/[()]/,"",$3); print $3}')
+    [ -n "$CH" ] || exit 0
+    if [ "$CH" -ge 52 ] && [ "$CH" -le 144 ]; then
+      logger -t hub11-ap "wlan0 on DFS channel $CH; AP not started"; exit 0
+    fi
+    if [ "${FREQ:-0}" -ge 5000 ]; then BAND=a; else BAND=bg; fi
+    [ -d /sys/class/net/wlan1 ] || /usr/local/sbin/wlan1-ap-iface || exit 0
+    nmcli con modify "$AP" 802-11-wireless.band "$BAND" 802-11-wireless.channel "$CH"
+    nmcli --wait 30 con up "$AP" >/dev/null 2>&1 \
+      && logger -t hub11-ap "AP up on channel $CH" \
+      || logger -t hub11-ap "AP start failed on channel $CH"
+    ;;
+  down|pre-down)
+    nmcli con down "$AP" >/dev/null 2>&1 || true
+    ;;
+esac
+exit 0

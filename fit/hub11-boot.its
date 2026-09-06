@@ -1,0 +1,57 @@
+/dts-v1/;
+
+/ {
+    description = "Hub-11 RK3588 mainline Linux 6.18 FIT boot image";
+    #address-cells = <1>;
+
+    images {
+        fdt {
+            description = "Mainline DTB (rk3588-hub11)";
+            data = /incbin/("./vendor.dtb");
+            type = "flat_dt";
+            arch = "arm64";
+            compression = "none";
+            load = <0xffffff00>;
+            hash {
+                algo = "sha256";
+            };
+        };
+
+        kernel {
+            description = "Linux kernel Image";
+            data = /incbin/("./Image");
+            type = "kernel";
+            arch = "arm64";
+            os = "linux";
+            compression = "none";
+            /* Rockchip "place anywhere" markers, matching vendor FIT shape. */
+            load = <0xffffff01>;
+            entry = <0xffffff01>;
+            hash {
+                algo = "sha256";
+            };
+        };
+
+        resource {
+            description = "Rockchip vendor resource payload (bootsplash + DTBO)";
+            data = /incbin/("./resource.img");
+            type = "multi";
+            arch = "arm64";
+            compression = "none";
+            hash {
+                algo = "sha256";
+            };
+        };
+    };
+
+    configurations {
+        default = "conf";
+        conf {
+            description = "Hub-11 mainline Linux 6.18 boot";
+            rollback-index = <0x0>;
+            kernel = "kernel";
+            fdt = "fdt";
+            multi = "resource";
+        };
+    };
+};

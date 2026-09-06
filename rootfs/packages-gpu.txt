@@ -1,0 +1,4 @@
+# Mesa userspace for the Panthor (Mali-G610) kernel driver. Profile: gpu
+libgl1-mesa-dri
+mesa-vulkan-drivers
+mesa-va-drivers

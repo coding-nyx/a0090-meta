@@ -1,0 +1,28 @@
+From 07643eb318ec2bdcd2f5ab7d97b91d4e87c7353e Mon Sep 17 00:00:00 2001
+From: Nyx <mail.me.nyx@gmail.com>
+Date: Sun, 6 Sep 2026 19:24:59 +0530
+Subject: [PATCH 2/2] arm64: dts: rockchip: add rk3588-hub11 board DTBs to
+ Makefile
+
+Adds the AMedia RK3588 LP4 V10 (hub-11) device tree and its SD
+high-speed-only fallback variant.
+---
+ arch/arm64/boot/dts/rockchip/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchip/Makefile
+index ad684e3831b..24b2b964db9 100644
+--- a/arch/arm64/boot/dts/rockchip/Makefile
++++ b/arch/arm64/boot/dts/rockchip/Makefile
+@@ -169,6 +169,8 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-evb1-v10.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-evb2-v10.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-firefly-itx-3588j.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-friendlyelec-cm3588-nas.dtb
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-hub11.dtb
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-hub11-sdhs.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-h96-max-v58.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-jaguar.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-jaguar-ethernet-switch.dtbo
+-- 
+2.55.0
+

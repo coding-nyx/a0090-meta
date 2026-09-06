@@ -1,0 +1,31 @@
+# Build artifacts
+*.o
+*.cmd
+*.dtb
+*.so
+*.a
+*.ko
+
+# Build directories
+build/
+out/
+*.tmp_versions/
+
+# Editor / OS junk
+*.swp
+*~
+.DS_Store
+*\#*\#
+.\#*
+
+# Kernel build output
+kernel-out/
+dist/
+
+# Local state
+*.log
+*.bak
+
+# Local secrets applied to the rootfs at build time (never commit)
+rootfs/secrets/
+rootfs/*.tar*

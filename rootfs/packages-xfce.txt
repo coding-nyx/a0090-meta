@@ -1,0 +1,60 @@
+# Lean XFCE desktop for hub-11 (Debian 13). Installed with --no-install-recommends.
+# Panthor (Mali-G610) is driven by Xorg's built-in modesetting driver, so no
+# xserver-xorg-video-* packages and no `xorg` metapackage.
+# Desktop config lives in rootfs/overlay/etc/skel/.config (xfconf channel XML).
+
+# display server + login
+xserver-xorg-core
+xserver-xorg-input-libinput
+x11-xserver-utils
+lightdm
+lightdm-gtk-greeter
+dbus-x11
+dbus-user-session
+
+# xfce core
+xfce4-session
+xfce4-settings
+xfce4-panel
+xfwm4
+xfdesktop4
+xfce4-appfinder
+xfce4-terminal
+thunar
+thunar-volman
+gvfs
+xdg-user-dirs
+
+# panel plugins (only what the single top panel uses)
+xfce4-whiskermenu-plugin
+xfce4-pulseaudio-plugin
+
+# sound server (PulseAudio-compatible)
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+libspa-0.2-bluetooth
+alsa-utils
+pavucontrol
+pulseaudio-utils
+xfce4-power-manager
+xfce4-notifyd
+xfce4-screenshooter
+
+# small utilities
+mousepad
+ristretto
+network-manager-gnome
+
+# look: dark, flat, quiet
+arc-theme
+papirus-icon-theme
+fonts-inter
+fonts-jetbrains-mono
+fonts-noto-color-emoji
+
+# gpu userspace (also needed headless for panthor tests)
+libgl1-mesa-dri
+mesa-vulkan-drivers
+mesa-va-drivers
