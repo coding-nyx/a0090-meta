@@ -1,0 +1,14 @@
+[Unit]
+Description=First-boot k3s agent install and join (hub-11)
+After=network-online.target NetworkManager-wait-online.target tailscaled.service
+Wants=network-online.target
+ConditionPathExists=!/usr/local/bin/k3s
+ConditionPathExists=/etc/rancher/k3s/join.env
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hub11-k3s-join
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

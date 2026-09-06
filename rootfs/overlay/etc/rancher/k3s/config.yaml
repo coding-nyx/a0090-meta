@@ -1,0 +1,18 @@
+# hub-11 k3s agent config (non-secret). Server URL + join token live in
+# /etc/rancher/k3s/join.env (rendered from rootfs/secrets/ at build time).
+#
+# hub-11 is a LAN worker: flannel over wlan0 like the rest of the cluster.
+# Do NOT use the Tailscale interface here: it is the only tailscale node in a
+# LAN flannel cluster and its 1280 MTU breaks pod networking (see docs).
+# node-ip must match hub-11's wlan0 address -> give it a DHCP reservation.
+flannel-iface: wlan0
+node-ip: 192.168.0.8
+node-external-ip: 192.168.0.8
+node-label:
+  - "nyx.io/arch=arm64"
+  - "nyx.io/worker-class=arm64"
+  - "nyx.io/role=k3s-agent"
+  - "nyx.io/availability=preferred"
+  - "nyx.io/soc=rk3588"
+  - "nyx.io/has-npu=true"
+  - "nyx.io/has-gpu=true"

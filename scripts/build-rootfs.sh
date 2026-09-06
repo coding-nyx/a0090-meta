@@ -77,6 +77,19 @@ if [ -f "$SEC/authorized_keys" ]; then
   install -d -m 700 "$ROOT/tmp/authkeys"; install -m 600 "$SEC/authorized_keys" "$ROOT/tmp/authkeys/authorized_keys"
 elif [ "$ALLOW_MISSING_SECRETS" != 1 ]; then echo "FATAL: $SEC/authorized_keys missing"; exit 1; fi
 
+# k3s join (infra profile): render /etc/rancher/k3s/join.env from the token secret
+# and enable the first-boot join unit. Non-infra builds skip this (unit has
+# ConditionPathExists=/etc/rancher/k3s/join.env, so it no-ops without it).
+case " $ROOTFS_PROFILES " in *" infra "*)
+  if [ -f "$SEC/k3s-token" ]; then
+    install -d -m 700 "$ROOT/etc/rancher/k3s"
+    { echo "K3S_URL=${K3S_URL:-https://192.168.0.9:6443}"; echo "K3S_TOKEN=$(cat "$SEC/k3s-token")"; }       > "$ROOT/etc/rancher/k3s/join.env"; chmod 600 "$ROOT/etc/rancher/k3s/join.env"
+    mkdir -p "$ROOT/etc/systemd/system/multi-user.target.wants"
+    ln -sf /etc/systemd/system/hub11-k3s-join.service "$ROOT/etc/systemd/system/multi-user.target.wants/hub11-k3s-join.service"
+  elif [ "$ALLOW_MISSING_SECRETS" != 1 ]; then echo "FATAL: infra profile needs $SEC/k3s-token"; exit 1; fi
+  ;;
+esac
+
 echo ">>> chroot hooks (profiles: $ROOTFS_PROFILES)"
 mount -t proc proc "$ROOT/proc"; mount -t sysfs sys "$ROOT/sys"
 mount --bind /dev "$ROOT/dev"; mount --bind /dev/pts "$ROOT/dev/pts"

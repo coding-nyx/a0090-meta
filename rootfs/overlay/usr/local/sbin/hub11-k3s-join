@@ -1,0 +1,16 @@
+#!/bin/sh
+# First-boot k3s agent install/join. Idempotent: does nothing once /usr/local/bin/k3s exists.
+# Reads K3S_URL + K3S_TOKEN from /etc/rancher/k3s/join.env; node-ip/iface/labels from
+# /etc/rancher/k3s/config.yaml. Pinned to the cluster's k3s version.
+set -eu
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+[ -x /usr/local/bin/k3s ] && exit 0
+[ -f /etc/rancher/k3s/join.env ] || { echo "hub11-k3s-join: no join.env, skipping"; exit 0; }
+. /etc/rancher/k3s/join.env
+: "${K3S_URL:?}" "${K3S_TOKEN:?}"
+# wait for the LAN address the config pins node-ip to
+for i in $(seq 1 60); do ip -4 addr show wlan0 2>/dev/null | grep -q 'inet ' && break; sleep 2; done
+curl -sfL https://get.k3s.io | \
+  INSTALL_K3S_VERSION="${K3S_VERSION:-v1.36.3+k3s1}" \
+  K3S_URL="$K3S_URL" K3S_TOKEN="$K3S_TOKEN" K3S_NODE_NAME=hub-11 \
+  sh -s - agent
