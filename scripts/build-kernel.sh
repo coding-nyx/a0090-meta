@@ -71,7 +71,10 @@ make -C "$SRC" O="$OUT" olddefconfig 2>&1 | tail -5
 
 NPROC=$(nproc)
 echo ">>> make -j$NPROC Image dtbs modules"
-make -C "$SRC" O="$OUT" -j"$NPROC" Image dtbs modules 2>&1 | grep -E "warning:|error:|Error|^  (LD|OBJCOPY|DTC).*(Image|hub11)" || true
+LOG="$OUT/build.log"
+make -C "$SRC" O="$OUT" -j"$NPROC" Image dtbs modules >"$LOG" 2>&1; RC=$?
+grep -E "warning:|error:|Error " "$LOG" | tail -40 || true
+[ "$RC" -eq 0 ] || { echo "FATAL: make failed (rc=$RC), see $LOG"; exit "$RC"; }
 
 test -f "$OUT/arch/arm64/boot/Image" || { echo "FATAL: Image not built"; exit 1; }
 for d in "$META"/dts/rk3588-hub11*.dts; do

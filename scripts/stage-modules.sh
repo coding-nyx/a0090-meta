@@ -33,7 +33,7 @@ ssh "$HUB11" "
   sudo -n cp -a '$KREL/.' /usr/lib/modules/$KREL/
   sudo -n depmod -a $KREL
   sudo -n mkdir -p /usr/lib/firmware
-  sudo -n cp -a fw/. /usr/lib/firmware/
+  sudo -n cp -r --no-preserve=all fw/. /usr/lib/firmware/
   cd / && rm -rf /tmp/modstage
   echo \"OK: /usr/lib/modules/$KREL (\$(find /usr/lib/modules/$KREL -name '*.ko*' | wc -l) modules), firmware refreshed\"
 "

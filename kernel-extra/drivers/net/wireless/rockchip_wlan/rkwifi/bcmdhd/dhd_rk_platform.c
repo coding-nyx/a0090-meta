@@ -10,7 +10,7 @@
  *
  *   wireless-wlan {
  *       compatible = "wlan-platdata";
- *       host-wake-gpios = <&gpio0 RK_PB2 GPIO_ACTIVE_HIGH>;   /* gpiod "host-wake" */
+ *       host-wake-gpios = <&gpio0 RK_PB2 GPIO_ACTIVE_HIGH>;   (gpiod con_id "host-wake")
  *   };
  */
 #include <linux/kernel.h>
