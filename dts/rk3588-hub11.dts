@@ -159,7 +159,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&hp_det>;
 		simple-audio-card,name = "rockchip-es8388";
-		simple-audio-card,aux-devs = <&amp_speaker>;
+		simple-audio-card,aux-devs = <&amp_headphone>, <&amp_speaker>;
 		simple-audio-card,format = "i2s";
 		simple-audio-card,hp-det-gpios = <&gpio1 RK_PC4 GPIO_ACTIVE_LOW>;
 		simple-audio-card,mclk-fs = <256>;
@@ -169,8 +169,10 @@
 			"Speaker Amplifier INR", "ROUT2",
 			"Speaker", "Speaker Amplifier OUTL",
 			"Speaker", "Speaker Amplifier OUTR",
-			"Headphones", "LOUT1",
-			"Headphones", "ROUT1",
+			"Headphones Amplifier INL", "LOUT1",
+			"Headphones Amplifier INR", "ROUT1",
+			"Headphones", "Headphones Amplifier OUTL",
+			"Headphones", "Headphones Amplifier OUTR",
 			"LINPUT1", "Onboard Microphone",
 			"LINPUT2", "Onboard Microphone",
 			"RINPUT1", "Microphone Jack",
@@ -189,6 +191,15 @@
 			sound-dai = <&es8388>;
 			system-clock-frequency = <12288000>;
 		};
+	};
+
+	amp_headphone: headphone-amplifier {
+		compatible = "simple-audio-amplifier";
+		enable-gpios = <&gpio4 RK_PA4 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&hp_con>;
+		sound-name-prefix = "Headphones Amplifier";
+		VCC-supply = <&vcc5v0_sys>;
 	};
 
 	amp_speaker: speaker-amplifier {
@@ -419,6 +430,10 @@
 	audio {
 		hp_det: hp-det {
 			rockchip,pins = <1 RK_PC4 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+
+		hp_con: hp-con {
+			rockchip,pins = <4 RK_PA4 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 
 		spk_con: spk-con {
