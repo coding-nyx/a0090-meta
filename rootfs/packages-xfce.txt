@@ -46,6 +46,7 @@ xfce4-screenshooter
 mousepad
 ristretto
 network-manager-gnome
+blueman
 
 # look: dark, flat, quiet
 arc-theme

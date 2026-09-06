@@ -160,6 +160,8 @@
 		pinctrl-0 = <&hp_det>;
 		simple-audio-card,name = "rockchip-es8388";
 		simple-audio-card,aux-devs = <&amp_headphone>, <&amp_speaker>;
+		simple-audio-card,bitclock-master = <&daicpu>;
+		simple-audio-card,frame-master = <&daicpu>;
 		simple-audio-card,format = "i2s";
 		simple-audio-card,hp-det-gpios = <&gpio1 RK_PC4 GPIO_ACTIVE_LOW>;
 		simple-audio-card,mclk-fs = <256>;
@@ -183,8 +185,9 @@
 			"Headphone", "Headphones",
 			"Speaker", "Speaker";
 
-		simple-audio-card,cpu {
+		daicpu: simple-audio-card,cpu {
 			sound-dai = <&i2s0_8ch>;
+			system-clock-frequency = <12288000>;
 		};
 
 		simple-audio-card,codec {
@@ -376,7 +379,6 @@
 
 &i2s0_8ch {
 	pinctrl-0 = <&i2s0_lrck &i2s0_mclk &i2s0_sclk &i2s0_sdi0 &i2s0_sdo0>;
-	rockchip,trcm-sync-tx-only;
 	status = "okay";
 };
 
