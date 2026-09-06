@@ -1,6 +1,8 @@
 [Unit]
 Description=Rescan PCI if the brcmfmac Wi-Fi card did not enumerate
 After=network-pre.target
+ConditionPathExists=/sys/bus/pci/rescan
+ConditionVirtualization=!container
 Before=NetworkManager.service
 
 [Service]
