@@ -15,7 +15,8 @@ reproducible Debian 13 (trixie) arm64 rootfs, and the recovery material.
 | swap | zram, 50 % of RAM, zstd (`systemd-zram-generator`) |
 | network | `eth0`/`eth1` GbE, `wlan0` client (BCM43752), Tailscale `100.88.4.63` |
 | desktop | lean XFCE, LightDM autologin (docs/desktop.md) |
-| hotspot | `wlan1` via vendor bcmdhd (kernel-extra/), see docs/wlan1-ap.md |
+| hotspot | not available yet: brcmfmac has no AP mode with this firmware, the vendor bcmdhd port (kernel-extra/) does not boot the radio; see docs/wlan1-ap.md |
+| audio | HDMI + ES8388 analog (PipeWire), Bluetooth A2DP after pairing; docs/desktop.md |
 
 The vendor Debian 11 userland is gone; only the vendor boot FIT is archived
 (`lab:~/hub11-backups/backup-installed-boot-20260905-2330.fit`).
