@@ -3,8 +3,62 @@ Date: Sun, 6 Sep 2026 23:40:00 +0530
 Subject: [PATCH 5/5] ASoC: es8328: apply the Rockchip vendor ES8388 power-up sequence
 
 The ES8388 on the AMedia RK3588 LP4 V10 (hub-11) decodes a valid I2S stream
-into noise with the mainline initialisation. The vendor es8323.c driver
-programs DAC-side MCLK as chip master clock, ADC/DAC same-fs, SLRCK, the
-analog low-power bits and the ADC ratio at probe; replay that sequence via
-regmap at component probe and keep the ADC divider in step with the DAC one.
+into noise with mainline init. The vendor es8323.c programs DAC-side MCLK as
+chip master clock, ADC/DAC same-fs, SLRCK, analog low-power bits and the ADC
+ratio at probe; replay that via regmap at component probe and keep the ADC
+divider in step with the DAC one in hw_params.
 ---
+diff --git a/sound/soc/codecs/es8328.c b/sound/soc/codecs/es8328.c
+index 49cb7e0cf95..936b8555a27 100644
+--- a/sound/soc/codecs/es8328.c
++++ b/sound/soc/codecs/es8328.c
+@@ -554,6 +554,11 @@ static int es8328_hw_params(struct snd_pcm_substream *substream,
+ 				ES8328_ADCCONTROL4_ADCWL_MASK,
+ 				wl << ES8328_ADCCONTROL4_ADCWL_SHIFT);
+ 
++	/* SameFs: keep the ADC divider in step with the DAC one */
++	if (reg == ES8328_DACCONTROL2)
++		snd_soc_component_update_bits(component, ES8328_ADCCONTROL5,
++					      ES8328_RATEMASK, ratio);
++
+ 	return snd_soc_component_update_bits(component, reg, ES8328_RATEMASK, ratio);
+ }
+ 
+@@ -817,6 +822,37 @@ static int es8328_component_probe(struct snd_soc_component *component)
+ 		goto clk_fail;
+ 	}
+ 
++	/*
++	 * ES8388 power-up sequence as used by the Rockchip vendor driver
++	 * (es8323.c). Without it the DAC on the AMedia RK3588 LP4 V10 board
++	 * decodes a valid I2S stream into noise: DAC-side MCLK as chip master
++	 * clock, ADC/DAC same fs, DAC LRCK taken from the ADC LRCK (SLRCK),
++	 * analog low-power bits and the ADC ratio all have to be programmed.
++	 * Written through the component (regmap) so the cache stays coherent.
++	 */
++	{
++		static const struct { u8 reg, val; } es8388_init[] = {
++			{ 0x01, 0x60 }, { 0x02, 0xf3 }, { 0x02, 0xf0 },
++			{ 0x2b, 0x80 }, { 0x00, 0x36 }, { 0x08, 0x00 },
++			{ 0x04, 0x00 }, { 0x06, 0xc3 }, { 0x19, 0x02 },
++			{ 0x09, 0x00 }, { 0x0a, 0xf8 }, { 0x0b, 0x82 },
++			{ 0x0c, 0x0c }, { 0x0d, 0x02 }, { 0x10, 0x00 },
++			{ 0x11, 0x00 }, { 0x12, 0x00 }, { 0x13, 0xc0 },
++			{ 0x14, 0x05 }, { 0x15, 0x06 }, { 0x16, 0x52 },
++			{ 0x17, 0x18 }, { 0x18, 0x02 }, { 0x1a, 0x00 },
++			{ 0x1b, 0x00 }, { 0x27, 0xb8 }, { 0x2a, 0xb8 },
++		};
++		int i;
++
++		for (i = 0; i < ARRAY_SIZE(es8388_init); i++)
++			snd_soc_component_write(component, es8388_init[i].reg,
++						es8388_init[i].val);
++		usleep_range(18000, 20000);
++		snd_soc_component_write(component, 0x03, 0x09);
++		snd_soc_component_write(component, 0x02, 0x00);
++		usleep_range(18000, 20000);
++	}
++
+ 	return 0;
+ 
+ clk_fail:
