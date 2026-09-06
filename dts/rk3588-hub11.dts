@@ -379,6 +379,8 @@
 
 &i2s0_8ch {
 	pinctrl-0 = <&i2s0_lrck &i2s0_mclk &i2s0_sclk &i2s0_sdi0 &i2s0_sdo0>;
+	/* one LRCK pin on this board: vendor ran clk-trcm=1 (tx-only) */
+	rockchip,trcm-sync-tx-only;
 	status = "okay";
 };
 
