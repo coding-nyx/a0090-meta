@@ -38,3 +38,12 @@ Headless use: `sudo systemctl set-default multi-user.target` and reboot, or
 The PNG is produced by a few lines of Pillow (see the 2026-09-06 session
 notes); replace the file and keep the path, or point
 `xfce4-desktop.xml` (`monitorHDMI-1` and `monitor0` blocks) elsewhere.
+
+## Audio
+
+Cards: `hdmi0` (HDMI out, needs a display with speakers or a headphone jack),
+`rockchipes8388` (board speaker connector + 3.5 mm headphone jack), `SPDIF`.
+PipeWire + WirePlumber serve PulseAudio clients. The ES8388 powers up with
+`Output 1/2 Playback Volume` at 0, so `hub11-audio-defaults.service` sets them
+at boot (overlay `usr/local/sbin/hub11-audio-defaults`). Change the default
+sink with `pactl set-default-sink <name>` or the panel plugin.

@@ -1,0 +1,12 @@
+#!/bin/sh
+# ES8388 (card "rockchipes8388") powers up with both analog output volumes at 0.
+# Set sane defaults once the card exists; alsa-restore may later override with a saved state.
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+for i in $(seq 1 20); do [ -e /proc/asound/rockchipes8388 ] && break; sleep 0.5; done
+C=rockchipes8388
+amixer -q -c $C cset name="Output 1 Playback Volume" 30,30 2>/dev/null   # headphone jack (LOUT1/ROUT1), max 36
+amixer -q -c $C cset name="Output 2 Playback Volume" 30,30 2>/dev/null   # speaker (LOUT2/ROUT2)
+amixer -q -c $C cset name="PCM Volume" 192,192 2>/dev/null
+amixer -q -c $C cset name="Headphones Switch" on 2>/dev/null
+amixer -q -c $C cset name="Speaker Switch" on 2>/dev/null
+exit 0

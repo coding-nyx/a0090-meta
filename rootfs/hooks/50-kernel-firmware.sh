@@ -3,4 +3,5 @@
 set -eu
 depmod -a "$KREL"
 systemctl enable systemd-zram-setup@zram0.service >/dev/null 2>&1 || true
-systemctl enable pci-wifi-check.service ssh-hostkeys-regen.service >/dev/null 2>&1
+systemctl enable pci-wifi-check.service ssh-hostkeys-regen.service hub11-audio-defaults.service 2>/dev/null || true
+  systemctl enable pci-wifi-check.service ssh-hostkeys-regen.service >/dev/null 2>&1
