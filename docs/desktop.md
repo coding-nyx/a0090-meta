@@ -43,7 +43,25 @@ notes); replace the file and keep the path, or point
 
 Cards: `hdmi0` (HDMI out, needs a display with speakers or a headphone jack),
 `rockchipes8388` (board speaker connector + 3.5 mm headphone jack), `SPDIF`.
-PipeWire + WirePlumber serve PulseAudio clients. The ES8388 powers up with
-`Output 1/2 Playback Volume` at 0, so `hub11-audio-defaults.service` sets them
-at boot (overlay `usr/local/sbin/hub11-audio-defaults`). Change the default
-sink with `pactl set-default-sink <name>` or the panel plugin.
+PipeWire + WirePlumber serve PulseAudio clients (Bluetooth A2DP via
+`libspa-0.2-bluetooth`; pair devices with the Blueman tray applet). The ES8388
+powers up with `Output 1/2 Playback Volume` at 0, so `hub11-audio-defaults.service`
+sets them at boot (overlay `usr/local/sbin/hub11-audio-defaults`). Change the
+default sink with `pactl set-default-sink <name>` or the panel plugin.
+
+### ES8388 wiring and the two bugs that made it silent / whirring
+
+DTS (`analog-sound`): SoC I2S0 is bit/frame clock master (codec-master mode
+hangs the I2S0 TDM controller on this board), `mclk-fs = 256`, MCLK 12.288 MHz
+from `I2S0_8CH_MCLKOUT`, format `i2s`. Headphone amp enable GPIO4_A4 and speaker
+amp enable GPIO1_D3 are `simple-audio-amplifier` aux devices, headphone detect
+GPIO1_C4 (active low). Vendor pin routing (LRCK/SCLK/SDI0/SDO0) is identical.
+
+1. Silence: both analog output volume registers default to 0 (fixed by the boot unit).
+2. Whirring: in clock-consumer mode the mainline `es8328` driver left the
+   MCLK/LRCK ratio register at 0; `patches/0004-ASoC-es8328-program-MCLK-ratio-in-consumer-mode.patch`
+   programs it (0x02 = 256fs) like the vendor driver does. Verify with
+   `sudo i2cget -f -y 7 0x11 0x18` during playback -> `0x02`.
+
+Bluetooth: if `bluetoothctl show` says `Powered: no` and power-on fails, check
+`rfkill list`; a soft block was the cause once (`rfkill unblock bluetooth`).

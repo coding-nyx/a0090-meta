@@ -27,7 +27,7 @@ KERNEL_TAG                 pinned stable tag (v6.18.49), bumped deliberately
 RK_BIN_SHA                 sha256 of the rk3588 first-stage blobs (untouched on p1)
 configs/                   Kconfig fragments merged onto arch/arm64 defconfig
 dts/rk3588-hub11.dts       board DTS (mainline bindings); -sdhs.dts = SD high-speed fallback
-patches/                   applied with git am onto KERNEL_TAG (pci retries, DTB Makefile, bcmdhd hook)
+patches/                   applied with git am onto KERNEL_TAG (pci retries, DTB Makefile, bcmdhd hook, es8328 ratio)
 kernel-extra/              out-of-tree sources copied into the tree (Rockchip bcmdhd, ported)
 fit/hub11-boot.its         FIT: kernel + DTB + resource.img, vendor load-address shape
 firmware-blobs/            Wi-Fi/BT/Mali firmware + vendor resource.img, MANIFEST.yaml with sha256
